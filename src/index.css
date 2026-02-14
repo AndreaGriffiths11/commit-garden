@@ -3,3 +3,24 @@
 body {
   margin: 0;
 }
+
+@keyframes weather-fall {
+  0% {
+    transform: translateY(-20px) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--sway, 20px)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-weather-fall {
+  animation: weather-fall linear infinite;
+}
