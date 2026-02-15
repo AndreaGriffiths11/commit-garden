@@ -1,302 +1,220 @@
 import { useState, useEffect, useRef } from "react";
 
-// --- Season System ---
-const SEASONS = {
-  spring: {
-    name: "Spring",
-    icon: "🌸",
-    months: [2, 3, 4],
-    bg: "from-[#1a0f1e] via-[#1e1025] to-[#16091a]",
-    accent: "#f472b6",
-    stem: "#4ade80",
-    leaves: ["#4ade80", "#22c55e", "#86efac"],
-    flower: "#f472b6",
-    flowerAlt: "#e879f9",
-    sparkline: "#f472b6",
-    potDeco: "🌸",
-    particle: "🌸",
-    particleCount: 20,
-    msgs: [
-      "Fresh start! Plant a commit seed.",
-      "Spring sprout! Keep going.",
-      "Growing in the warm breeze.",
-      "Your garden is flourishing!",
-      "A lush spring canopy!",
-      "Full bloom — absolutely gorgeous.",
-    ],
-  },
-  summer: {
-    name: "Summer",
-    icon: "☀️",
-    months: [5, 6, 7],
-    bg: "from-[#0a1628] via-[#0f1e30] to-[#081420]",
-    accent: "#38bdf8",
-    stem: "#22c55e",
-    leaves: ["#16a34a", "#22c55e", "#4ade80"],
-    flower: "#f472b6",
-    flowerAlt: "#fb923c",
-    sparkline: "#38bdf8",
-    potDeco: "🐚",
-    particle: "✨",
-    particleCount: 15,
-    msgs: [
-      "Sunny days — plant a commit!",
-      "A summer sprout rises.",
-      "Growing strong in the heat.",
-      "Your garden soaks up the sun!",
-      "Long days, great code.",
-      "Full bloom under summer skies!",
-    ],
-  },
-  fall: {
-    name: "Fall",
-    icon: "🍂",
-    months: [8, 9, 10],
-    bg: "from-[#1a1008] via-[#1e150a] to-[#140e06]",
-    accent: "#fb923c",
-    stem: "#a3e635",
-    leaves: ["#ca8a04", "#eab308", "#f59e0b"],
-    flower: "#fb923c",
-    flowerAlt: "#ef4444",
-    sparkline: "#fb923c",
-    potDeco: "🎃",
-    particle: "🍁",
-    particleCount: 18,
-    msgs: [
-      "Harvest season — plant a seed!",
-      "An autumn sprout appears.",
-      "Growing among falling leaves.",
-      "Your garden glows golden!",
-      "A warm amber canopy.",
-      "Full bloom in autumn splendor!",
-    ],
-  },
-  winter: {
-    name: "Winter",
-    icon: "❄️",
-    months: [11, 0, 1],
-    bg: "from-[#0c1220] via-[#111827] to-[#0a0f1a]",
-    accent: "#93c5fd",
-    stem: "#86efac",
-    leaves: ["#6ee7b7", "#34d399", "#a7f3d0"],
-    flower: "#93c5fd",
-    flowerAlt: "#c4b5fd",
-    sparkline: "#93c5fd",
-    potDeco: "⛄",
-    particle: "❄️",
-    particleCount: 22,
-    msgs: [
-      "Cold outside — warm up with a commit!",
-      "A frosty sprout pushes through.",
-      "Growing despite the chill.",
-      "Your garden braves the winter!",
-      "Hardy and evergreen.",
-      "Full bloom in the snow — magical!",
-    ],
-  },
-};
+// ============================================
+// PLANT STAGES - Epic & Cute
+// ============================================
 
-type SeasonKey = keyof typeof SEASONS;
+const STAGES = [
+  { name: "Seed", color: "#8B6914", msg: "Plant a seed today — make your first commit!" },
+  { name: "Sprout", color: "#7CB342", msg: "A tiny sprout! Keep going." },
+  { name: "Seedling", color: "#66BB6A", msg: "Growing nicely. Building momentum." },
+  { name: "Growing", color: "#43A047", msg: "Strong and steady. Your garden thrives!" },
+  { name: "Leafy", color: "#2E7D32", msg: "Look at that canopy! You're on fire." },
+  { name: "Bloom", color: "#FFD700", msg: "Full bloom! Absolutely magnificent." },
+];
 
-function getSeason(): SeasonKey {
-  const month = new Date().getMonth();
-  for (const [key, s] of Object.entries(SEASONS)) {
-    if (s.months.includes(month)) return key as SeasonKey;
-  }
-  return "spring";
-}
+// ============================================
+// EPIC PLANT SVG
+// ============================================
 
-const STAGE_NAMES = ["Seed", "Sprout", "Seedling", "Growing", "Leafy", "Bloom"];
-
-// --- Weather Particles ---
-function WeatherParticles({ season }: { season: typeof SEASONS[SeasonKey] }) {
-  const particles = Array.from({ length: season.particleCount }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    delay: Math.random() * 8,
-    duration: 6 + Math.random() * 6,
-    size: 10 + Math.random() * 10,
-    sway: (Math.random() - 0.5) * 40,
-  }));
-
-  return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {particles.map((p) => (
-        <span
-          key={p.id}
-          className="absolute animate-weather-fall"
-          style={{
-            left: `${p.left}%`,
-            top: "-20px",
-            fontSize: `${p.size}px`,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-            ["--sway" as string]: `${p.sway}px`,
-          }}
-        >
-          {season.particle}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-// --- Plant SVG ---
-function PlantSVG({ stage, season }: { stage: number; season: typeof SEASONS[SeasonKey] }) {
+function PlantSVG({ stage }: { stage: number }) {
   const s = Math.min(stage, 5);
+  
   return (
-    <svg viewBox="0 0 200 300" className="w-64 h-80 mx-auto" style={{ filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.2))" }}>
+    <svg viewBox="0 0 200 320" className="w-72 h-96 mx-auto" style={{ filter: "drop-shadow(0 10px 30px rgba(0,0,0,0.3))" }}>
       {/* Pot */}
-      <path d="M60 240 L80 280 L120 280 L140 240 Z" fill="#C4956A" stroke="#A0724E" strokeWidth="2" />
-      <ellipse cx="100" cy="240" rx="42" ry="8" fill="#D4A574" />
-      <ellipse cx="100" cy="242" rx="36" ry="6" fill="#5D4037" />
-      {/* Pot decoration */}
-      <text x="100" y="268" textAnchor="middle" fontSize="14">{season.potDeco}</text>
+      <defs>
+        <linearGradient id="potGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#D4A574" />
+          <stop offset="50%" stopColor="#C4956A" />
+          <stop offset="100%" stopColor="#A0724E" />
+        </linearGradient>
+        <linearGradient id="soilGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#5D4037" />
+          <stop offset="100%" stopColor="#3E2723" />
+        </linearGradient>
+      </defs>
+      
+      {/* Pot shadow */}
+      <ellipse cx="100" cy="305" rx="50" ry="8" fill="rgba(0,0,0,0.2)" />
+      
+      {/* Pot body */}
+      <path d="M55 250 L70 300 L130 300 L145 250 Z" fill="url(#potGrad)" stroke="#8B5A2B" strokeWidth="2" />
+      <ellipse cx="100" cy="250" rx="45" ry="10" fill="#C4956A" />
+      <ellipse cx="100" cy="252" rx="38" ry="7" fill="url(#soilGrad)" />
+      
+      {/* Soil texture */}
+      <circle cx="80" cy="255" r="3" fill="#4E342E" opacity="0.6" />
+      <circle cx="110" cy="253" r="2" fill="#4E342E" opacity="0.5" />
+      <circle cx="95" cy="258" r="2.5" fill="#4E342E" opacity="0.4" />
 
       {/* Seed */}
       {s === 0 && (
-        <ellipse cx="100" cy="236" rx="6" ry="4" fill="#8B6914">
-          <animate attributeName="opacity" values="0.7;1;0.7" dur="3s" repeatCount="indefinite" />
-        </ellipse>
+        <g className="animate-bounce-slow">
+          <ellipse cx="100" cy="245" rx="8" ry="5" fill="#8B6914">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />
+          </ellipse>
+          {/* Tiny sprout emerging */}
+          <path d="M100 242 Q100 238 100 235" stroke="#6B8E23" strokeWidth="2" fill="none" strokeLinecap="round">
+            <animate attributeName="d" values="M100 242 Q100 240 100 240;M100 242 Q100 238 100 235" dur="2s" repeatCount="indefinite" />
+          </path>
+        </g>
       )}
 
-      {/* Stem */}
+      {/* Sprout */}
       {s >= 1 && (
-        <path
-          d={s === 1 ? "M100 238 Q100 220 100 210" :
-             s === 2 ? "M100 238 Q100 200 100 180" :
-             s === 3 ? "M100 238 Q98 190 100 150" :
-             s === 4 ? "M100 238 Q98 180 100 120" :
-             "M100 238 Q98 170 100 100"}
-          stroke={season.stem} strokeWidth={s <= 2 ? 3 : s <= 4 ? 4 : 5}
-          fill="none" strokeLinecap="round"
-        >
-          <animate attributeName="stroke-dashoffset" from="200" to="0" dur="1.5s" fill="freeze" />
-          <animate attributeName="stroke-dasharray" from="0 200" to="200 0" dur="1.5s" fill="freeze" />
-        </path>
+        <g>
+          <path
+            d={s === 1 ? "M100 250 Q100 235 100 225" : "M100 250 Q100 220 100 200"}
+            stroke="#6B8E23"
+            strokeWidth={s === 1 ? 3 : 4}
+            fill="none"
+            strokeLinecap="round"
+            className="animate-grow"
+          >
+            <animate attributeName="stroke-dashoffset" from="100" to="0" dur="1s" fill="freeze" />
+          </path>
+        </g>
       )}
 
-      {/* Lower leaves */}
+      {/* First leaves */}
       {s >= 2 && (
-        <g>
-          <path d="M100 200 Q115 190 120 195 Q115 205 100 200" fill={season.leaves[0]}>
-            <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="0.5s" fill="freeze" />
+        <g className="animate-sway">
+          <path d="M100 225 Q115 215 125 220 Q115 230 100 225" fill="#7CB342">
+            <animate attributeName="d" values="M100 225 Q115 220 125 225 Q115 230 100 225;M100 225 Q115 215 125 220 Q115 230 100 225" dur="3s" repeatCount="indefinite" />
           </path>
-          <path d="M100 195 Q85 185 80 190 Q85 200 100 195" fill={season.leaves[1]}>
-            <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="0.7s" fill="freeze" />
+          <path d="M100 220 Q85 210 75 215 Q85 225 100 220" fill="#8BC34A">
+            <animate attributeName="d" values="M100 220 Q85 215 75 220 Q85 225 100 220;M100 220 Q85 210 75 215 Q85 225 100 220" dur="3.5s" repeatCount="indefinite" />
           </path>
         </g>
       )}
 
-      {/* Mid leaves */}
+      {/* Growing */}
       {s >= 3 && (
-        <g>
-          <path d="M100 170 Q120 155 128 162 Q118 175 100 170" fill={season.leaves[0]}>
-            <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="0.8s" fill="freeze" />
-          </path>
-          <path d="M100 165 Q80 150 72 158 Q82 170 100 165" fill={season.leaves[1]}>
-            <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="1s" fill="freeze" />
-          </path>
+        <g className="animate-sway">
+          <path d="M100 200 Q120 185 135 195 Q120 210 100 200" fill="#4CAF50" />
+          <path d="M100 195 Q80 180 65 190 Q80 205 100 195" fill="#66BB6A" />
+          <path d="M100 185 Q110 170 100 155 Q90 170 100 185" fill="#43A047" />
         </g>
       )}
 
-      {/* Upper leaves */}
+      {/* Leafy */}
       {s >= 4 && (
-        <g>
-          <path d="M100 140 Q125 118 135 128 Q122 145 100 140" fill={season.leaves[2]}>
-            <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="1s" fill="freeze" />
-          </path>
-          <path d="M100 135 Q75 113 65 123 Q78 140 100 135" fill={season.leaves[0]}>
-            <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="1.2s" fill="freeze" />
-          </path>
-          <path d="M100 125 Q112 105 105 95 Q95 108 100 125" fill={season.leaves[1]}>
-            <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="1.4s" fill="freeze" />
-          </path>
+        <g className="animate-sway">
+          <path d="M100 170 Q130 150 145 165 Q125 180 100 170" fill="#388E3C" />
+          <path d="M100 165 Q70 145 55 160 Q75 175 100 165" fill="#2E7D32" />
+          <path d="M100 150 Q120 130 135 140 Q115 155 100 150" fill="#43A047" />
+          <path d="M100 145 Q80 125 65 135 Q85 150 100 145" fill="#4CAF50" />
+          {/* Tiny buds */}
+          <circle cx="145" cy="165" r="4" fill="#E91E63" className="animate-pulse" />
+          <circle cx="55" cy="160" r="3" fill="#F48FB1" className="animate-pulse" />
         </g>
       )}
 
-      {/* Flowers */}
+      {/* Full Bloom */}
       {s >= 5 && (
-        <g>
-          <g>
-            <circle cx="130" cy="120" r="8" fill={season.flower} opacity="0">
-              <animate attributeName="opacity" from="0" to="1" dur="0.6s" begin="1.5s" fill="freeze" />
-              <animate attributeName="r" from="4" to="8" dur="0.6s" begin="1.5s" fill="freeze" />
-            </circle>
-            <circle cx="130" cy="120" r="3" fill="#FFC107" opacity="0">
-              <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="1.8s" fill="freeze" />
-            </circle>
+        <g className="animate-sway">
+          {/* Main stem */}
+          <path d="M100 250 L100 100" stroke="#2E7D32" strokeWidth="5" fill="none" strokeLinecap="round" />
+          
+          {/* Big leaves */}
+          <path d="M100 180 Q140 160 155 175 Q135 195 100 180" fill="#388E3C" />
+          <path d="M100 175 Q60 155 45 170 Q65 190 100 175" fill="#2E7D32" />
+          <path d="M100 150 Q135 125 150 140 Q125 160 100 150" fill="#43A047" />
+          <path d="M100 145 Q65 120 50 135 Q75 155 100 145" fill="#388E3C" />
+          <path d="M100 120 Q125 95 140 110 Q115 130 100 120" fill="#4CAF50" />
+          <path d="M100 115 Q75 90 60 105 Q85 125 100 115" fill="#43A047" />
+          
+          {/* Flowers */}
+          <g className="animate-float">
+            {/* Pink flower */}
+            <circle cx="145" cy="130" r="15" fill="#F48FB1" />
+            <circle cx="145" cy="130" r="8" fill="#E91E63" />
+            <circle cx="145" cy="130" r="3" fill="#FFEB3B" />
+            {/* Purple flower */}
+            <circle cx="60" cy="125" r="12" fill="#CE93D8" />
+            <circle cx="60" cy="125" r="6" fill="#9C27B0" />
+            <circle cx="60" cy="125" r="2" fill="#FFEB3B" />
+            {/* Yellow flower */}
+            <circle cx="115" cy="85" r="14" fill="#FFF59D" />
+            <circle cx="115" cy="85" r="7" fill="#FFD700" />
+            <circle cx="115" cy="85" r="3" fill="#FF9800" />
           </g>
-          <g>
-            <circle cx="72" cy="115" r="7" fill={season.flowerAlt} opacity="0">
-              <animate attributeName="opacity" from="0" to="1" dur="0.6s" begin="1.7s" fill="freeze" />
-              <animate attributeName="r" from="3" to="7" dur="0.6s" begin="1.7s" fill="freeze" />
-            </circle>
-            <circle cx="72" cy="115" r="2.5" fill="#FFC107" opacity="0">
-              <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="2s" fill="freeze" />
-            </circle>
-          </g>
-          <g>
-            <circle cx="105" cy="90" r="9" fill={season.flower} opacity="0">
-              <animate attributeName="opacity" from="0" to="1" dur="0.6s" begin="1.9s" fill="freeze" />
-              <animate attributeName="r" from="4" to="9" dur="0.6s" begin="1.9s" fill="freeze" />
-            </circle>
-            <circle cx="105" cy="90" r="3.5" fill="#FFD54F" opacity="0">
-              <animate attributeName="opacity" from="0" to="1" dur="0.4s" begin="2.2s" fill="freeze" />
-            </circle>
-          </g>
-          {/* Sparkle particles */}
-          <circle cx="145" cy="105" r="2" fill={season.accent} opacity="0">
-            <animate attributeName="opacity" values="0;1;0" dur="2s" begin="2.5s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="58" cy="100" r="1.5" fill={season.accent} opacity="0">
-            <animate attributeName="opacity" values="0;1;0" dur="2.5s" begin="2.8s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="115" cy="78" r="1.5" fill={season.accent} opacity="0">
-            <animate attributeName="opacity" values="0;1;0" dur="1.8s" begin="3s" repeatCount="indefinite" />
-          </circle>
+          
+          {/* Sparkles */}
+          <circle cx="160" cy="120" r="3" fill="white" className="animate-sparkle" />
+          <circle cx="45" cy="140" r="2" fill="white" className="animate-sparkle" />
+          <circle cx="130" cy="70" r="2.5" fill="white" className="animate-sparkle" />
+          <circle cx="95" cy="60" r="2" fill="white" className="animate-sparkle" />
         </g>
       )}
+
+      {/* Ground grass */}
+      <path d="M30 300 Q50 295 70 300 Q90 295 110 300 Q130 295 150 300 Q170 295 190 300 L200 320 L0 320 Z" fill="#4CAF50" opacity="0.3" />
     </svg>
   );
 }
 
-// --- Sparkline ---
-function Sparkline({ data, color }: { data: { date: string; count: number }[]; color: string }) {
+// ============================================
+// SPARKLINE
+// ============================================
+
+function Sparkline({ data }: { data: { date: string; count: number }[] }) {
   if (!data.length) return null;
   const max = Math.max(...data.map((d) => d.count), 1);
   const w = 280;
-  const h = 60;
+  const h = 50;
   const points = data.map((d, i) => {
     const x = (i / (data.length - 1)) * w;
-    const y = h - (d.count / max) * (h - 10) - 5;
+    const y = h - (d.count / max) * (h - 8) - 4;
     return `${x},${y}`;
   }).join(" ");
   const days = ["S", "M", "T", "W", "T", "F", "S"];
+  
   return (
-    <div className="w-full max-w-xs mx-auto mt-6">
-      <svg viewBox={`0 0 ${w} ${h + 20}`} className="w-full">
+    <div className="w-full max-w-xs mx-auto">
+      <svg viewBox={`0 0 ${w} ${h + 24}`} className="w-full">
         {data.map((d, i) => {
           const x = (i / (data.length - 1)) * w;
           return (
-            <text key={i} x={x} y={h + 16} textAnchor="middle" fill="#9CA3AF" fontSize="10" fontFamily="monospace">
+            <text key={i} x={x} y={h + 18} textAnchor="middle" fill="#9CA3AF" fontSize="10" fontFamily="monospace">
               {days[new Date(d.date + "T12:00:00").getDay()]}
             </text>
           );
         })}
-        <polyline points={points} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        {/* Gradient area under line */}
+        <defs>
+          <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#4CAF50" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#4CAF50" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <polygon points={`0,${h} ${points} ${w},${h}`} fill="url(#sparkGrad)" />
+        <polyline points={points} fill="none" stroke="#4CAF50" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         {data.map((d, i) => {
           const x = (i / (data.length - 1)) * w;
-          const y = h - (d.count / max) * (h - 10) - 5;
-          return <circle key={i} cx={x} cy={y} r="4" fill={d.count > 0 ? color : "#374151"} stroke="#1F2937" strokeWidth="1.5" />;
+          const y = h - (d.count / max) * (h - 8) - 4;
+          return <circle key={i} cx={x} cy={y} r="5" fill={d.count > 0 ? "#4CAF50" : "#374151"} stroke="white" strokeWidth="2" />;
         })}
       </svg>
     </div>
   );
 }
 
-// --- Data Fetching ---
-function fetchGarden(username: string) {
+// ============================================
+// DATA FETCHING
+// ============================================
+
+interface GardenData {
+  username: string;
+  today: number;
+  streak: number;
+  stage: number;
+  totalLastYear: number;
+  recent: { date: string; count: number }[];
+}
+
+function fetchGarden(username: string): Promise<GardenData> {
   return fetch(`https://github-contributions-api.jogruber.de/v4/${username}?y=last`)
     .then((r) => {
       if (!r.ok) throw new Error("User not found");
@@ -344,19 +262,19 @@ function fetchGarden(username: string) {
     });
 }
 
-// --- Main App ---
+// ============================================
+// MAIN APP
+// ============================================
+
 export default function App() {
   const params = new URLSearchParams(window.location.search);
   const initialUser = params.get("user") || "";
 
   const [input, setInput] = useState(initialUser);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<GardenData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const seasonKey = getSeason();
-  const season = SEASONS[seasonKey];
 
   const loadUser = (username: string) => {
     setLoading(true);
@@ -386,112 +304,115 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b ${season.bg} flex flex-col items-center justify-center px-4 py-12 font-sans relative`}>
-      <WeatherParticles season={season} />
-
-      {/* Season indicator */}
-      <div className="fixed top-4 right-4 z-10">
-        <div
-          className="backdrop-blur-xl bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1.5 flex items-center gap-1.5"
-          style={{ color: season.accent }}
-        >
-          <span className="text-sm">{season.icon}</span>
-          <span className="text-xs font-medium">{season.name}</span>
-        </div>
-      </div>
-
-      <div className="max-w-sm w-full relative z-10">
+    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-teal-50 to-indigo-100 flex flex-col items-center justify-center px-4 py-12 font-sans">
+      <div className="max-w-md w-full">
+        {/* Header */}
         {!data && !loading && !error && (
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white tracking-tight mb-2">commit garden</h1>
-            <p className="text-gray-400 text-sm">watch your GitHub contributions grow into a plant</p>
+          <div className="text-center mb-10">
+            <div className="text-6xl mb-4">🌱</div>
+            <h1 className="text-4xl font-bold text-gray-800 tracking-tight mb-2">commit garden</h1>
+            <p className="text-gray-500">watch your code grow into something beautiful</p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex items-center gap-2 mb-6 justify-center">
+        {/* Search */}
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 mb-8 justify-center">
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">@</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">@</span>
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="github username"
-              className="backdrop-blur-xl bg-white/[0.06] border border-white/[0.1] rounded-lg pl-7 pr-3 py-2 text-white text-sm w-48 focus:outline-none focus:ring-1 placeholder-gray-600 transition-colors"
-              style={{ borderColor: `${season.accent}20`, ["--tw-ring-color" as string]: `${season.accent}40` }}
+              className="bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-2xl pl-8 pr-4 py-3 text-gray-700 w-56 focus:outline-none focus:border-teal-400 focus:ring-4 focus:ring-teal-100 transition-all placeholder-gray-400"
             />
           </div>
           <button
             type="submit"
-            className="text-white text-sm px-4 py-2 rounded-lg transition-colors font-medium"
-            style={{ backgroundColor: `${season.accent}cc` }}
+            className="bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white font-semibold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-teal-200 hover:shadow-teal-300"
           >
             Grow
           </button>
         </form>
 
+        {/* Loading */}
         {loading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-gray-400 animate-pulse text-lg">Growing your garden...</div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="text-6xl mb-4 animate-bounce">🌱</div>
+            <p className="text-gray-500 animate-pulse">Planting your garden...</p>
           </div>
         )}
 
+        {/* Error */}
         {error && (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-red-400 text-sm">{error}</div>
+          <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-center">
+            <p className="text-red-500">{error}</p>
           </div>
         )}
 
+        {/* Results */}
         {!loading && !error && data && (
-          <>
-            <div className="text-center mb-2">
-              <h1 className="text-2xl font-bold text-white tracking-tight">
+          <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/50">
+            {/* Username */}
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
                 {data.username}
-                <span className="text-gray-500 font-normal text-lg">&apos;s garden</span>
-              </h1>
+                <span className="text-gray-400 font-normal">'s garden</span>
+              </h2>
             </div>
 
-            <div className="my-6">
-              <PlantSVG stage={data.stage} season={season} />
+            {/* Plant */}
+            <div className="my-8 -mx-4">
+              <PlantSVG stage={data.stage} />
             </div>
 
+            {/* Stage badge */}
             <div className="text-center mb-8">
-              <div
-                className="inline-block px-3 py-1 rounded-full text-sm font-medium mb-2"
-                style={{ backgroundColor: `${season.accent}22`, color: season.accent }}
+              <span
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold"
+                style={{ backgroundColor: STAGES[data.stage].color + "20", color: STAGES[data.stage].color }}
               >
-                {STAGE_NAMES[data.stage]}
+                {data.stage === 5 && "🌸 "}
+                {data.stage === 4 && "🌿 "}
+                {data.stage === 3 && "🌱 "}
+                {data.stage === 2 && "🌿 "}
+                {data.stage === 1 && "🌱 "}
+                {data.stage === 0 && "🌰 "}
+                {STAGES[data.stage].name}
+              </span>
+              <p className="text-gray-500 text-sm mt-2">{STAGES[data.stage].msg}</p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 text-center border border-amber-100">
+                <div className="text-3xl font-bold text-gray-800">{data.today}</div>
+                <div className="text-xs text-gray-500 mt-1">today</div>
               </div>
-              <p className="text-gray-400 text-sm">{season.msgs[data.stage]}</p>
+              <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-4 text-center border border-rose-100">
+                <div className="text-3xl font-bold text-gray-800">{data.streak}</div>
+                <div className="text-xs text-gray-500 mt-1">streak</div>
+              </div>
+              <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-4 text-center border border-violet-100">
+                <div className="text-3xl font-bold text-gray-800">{data.totalLastYear.toLocaleString()}</div>
+                <div className="text-xs text-gray-500 mt-1">this year</div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              {[
-                { val: data.today, label: "today" },
-                { val: data.streak, label: "day streak" },
-                { val: data.totalLastYear.toLocaleString(), label: "this year" },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="backdrop-blur-xl bg-white/[0.04] rounded-xl p-3 text-center border border-white/[0.08]"
-                >
-                  <div className="text-2xl font-bold text-white">{stat.val}</div>
-                  <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
-                </div>
-              ))}
+            {/* Sparkline */}
+            <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
+              <div className="text-xs text-gray-400 mb-2 text-center">Last 7 days</div>
+              <Sparkline data={data.recent} />
             </div>
-
-            <div className="backdrop-blur-xl bg-white/[0.04] rounded-xl p-4 border border-white/[0.08]">
-              <div className="text-xs text-gray-500 mb-1 text-center">Last 7 days</div>
-              <Sparkline data={data.recent} color={season.sparkline} />
-            </div>
-          </>
+          </div>
         )}
 
-        <div className="text-center mt-8 pt-6 border-t border-white/[0.06]">
-          <p className="text-gray-500 text-xs">
-            made with <span className="text-red-400">&#9829;</span> by{" "}
-            <a href="https://github.com/AndreaGriffiths11" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-gray-400 text-sm">
+            made with ♥ by{" "}
+            <a href="https://github.com/AndreaGriffiths11" className="text-teal-500 hover:underline">
               Andrea Griffiths
             </a>
           </p>
