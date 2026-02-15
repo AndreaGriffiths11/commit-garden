@@ -368,10 +368,9 @@ export default function App() {
             </div>
 
             {/* Stage badge */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
               <span
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold"
-                style={{ backgroundColor: STAGES[data.stage].color + "20", color: STAGES[data.stage].color }}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
               >
                 {data.stage === 5 && "🌸 "}
                 {data.stage === 4 && "🌿 "}
@@ -381,22 +380,22 @@ export default function App() {
                 {data.stage === 0 && "🌰 "}
                 {STAGES[data.stage].name}
               </span>
-              <p className="text-gray-500 text-sm mt-2">{STAGES[data.stage].msg}</p>
+              <p className="text-gray-500 text-sm mt-3">{STAGES[data.stage].msg}</p>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 text-center border border-amber-100">
+            <div className="grid grid-cols-3 gap-3 mb-8">
+              <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
                 <div className="text-3xl font-bold text-gray-800">{data.today}</div>
-                <div className="text-xs text-gray-500 mt-1">today</div>
+                <div className="text-xs text-gray-400 mt-1">today</div>
               </div>
-              <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-4 text-center border border-rose-100">
+              <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
                 <div className="text-3xl font-bold text-gray-800">{data.streak}</div>
-                <div className="text-xs text-gray-500 mt-1">streak</div>
+                <div className="text-xs text-gray-400 mt-1">streak</div>
               </div>
-              <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-4 text-center border border-violet-100">
+              <div className="bg-gray-50 rounded-2xl p-4 text-center border border-gray-100">
                 <div className="text-3xl font-bold text-gray-800">{data.totalLastYear.toLocaleString()}</div>
-                <div className="text-xs text-gray-500 mt-1">this year</div>
+                <div className="text-xs text-gray-400 mt-1">this year</div>
               </div>
             </div>
 
